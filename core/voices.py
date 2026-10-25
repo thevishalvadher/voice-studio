@@ -20,6 +20,11 @@ EMPTY_DB = {"version": 1, "voices": []}
 
 def ensure_storage():
     """Create the Drive folders and an empty voices.json if they are missing."""
+    drive = Path("/content/drive/MyDrive")
+    if str(config.DATA_ROOT).startswith(str(drive)) and not drive.exists():
+        # Without this check, files would be saved on the temporary Colab disk
+        # and lost when the runtime stops.
+        raise StudioError("Google Drive is not connected. Run the Setup cell and allow Drive access.")
     config.voices_dir().mkdir(parents=True, exist_ok=True)
     config.outputs_dir().mkdir(parents=True, exist_ok=True)
     if not config.voices_json().exists():

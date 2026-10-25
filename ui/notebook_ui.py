@@ -23,6 +23,7 @@ from core import voices
 _state = {
     "sample_path": None,     # the uploaded/recorded file waiting to be saved
     "voice_dropdown": None,  # the Generate section's voice list (refreshed after a save)
+    "generate_status": None, # the Generate section's status line
 }
 
 # Makes widget labels wide enough to read.
@@ -39,13 +40,29 @@ def _msg(text, kind="info"):
     return f'<div style="color:{colours[kind]};font-size:14px;margin:4px 0">{text}</div>'
 
 
+def _friendly_error(err):
+    """Turn an unexpected technical error into a plain-English message."""
+    text = str(err)
+    lower = text.lower()
+    if "out of memory" in lower:
+        return ("The GPU ran out of memory. Try shorter text, or use "
+                "Runtime → Restart session and run Setup again.")
+    if "transport endpoint is not connected" in lower or "/content/drive" in lower:
+        return "Google Drive got disconnected. Run the Setup cell again, then try again."
+    return f"Something went wrong: {text}. Try again, or run the Setup cell again."
+
+
 # ---------------------------------------------------------------------------
 # 1. Setup
 # ---------------------------------------------------------------------------
 
 def setup():
     """Create the Drive folders, then load each engine used by an enabled language (once)."""
-    voices.ensure_storage()
+    try:
+        voices.ensure_storage()
+    except StudioError as err:
+        print(f"❌ {err}")
+        return
     print("📁 Voices folder: ", config.voices_dir())
     print("📁 Outputs folder:", config.outputs_dir())
     print(f"🗣️  Saved voices: {len(voices.list_voices())}")
@@ -196,11 +213,10 @@ def show_add_voice():
         style=WIDE,
     )
     # Languages that exist but are switched off (e.g. Gujarati) are shown as "coming soon".
-    coming_soon = ", ".join(
-        f'{info["label"]} ({info.get("note", "not ready")})'
+    soon_note = widgets.HTML("".join(
+        _msg(f'🔒 {info["label"]}: coming soon ({info.get("note", "not ready yet")})')
         for info in config.disabled_languages().values()
-    )
-    soon_note = widgets.HTML(_msg(f"Coming soon: {coming_soon}") if coming_soon else "")
+    ))
 
     consent_cb = widgets.Checkbox(
         description="I have signed consent from this person to clone their voice (required)",
@@ -220,9 +236,7 @@ def show_add_voice():
         except StudioError as err:
             status.value = _msg(f"❌ {err}", "error")
         except Exception as err:
-            status.value = _msg(
-                f"❌ Something went wrong: {err}. Try again, or run the Setup cell again.", "error"
-            )
+            status.value = _msg(f"❌ {_friendly_error(err)}", "error")
         else:
             status.value = _msg(
                 f"✅ Saved '{voice['name']}' ({voice['sample_seconds']} s sample). "
@@ -282,6 +296,8 @@ def refresh_voice_list():
     dropdown = _state["voice_dropdown"]
     if dropdown is not None:
         dropdown.options = _voice_options()
+    if _state.get("generate_status") is not None and dropdown and dropdown.options:
+        _state["generate_status"].value = ""
 
 
 def show_generate():
@@ -322,6 +338,7 @@ def show_generate():
 
     gen_btn = widgets.Button(description="Generate", button_style="success", icon="play")
     status = widgets.HTML()
+    _state["generate_status"] = status
     player = widgets.Output()
 
     def on_voice_change(_change=None):
@@ -356,9 +373,7 @@ def show_generate():
         except StudioError as err:
             status.value = _msg(f"❌ {err}", "error")
         except Exception as err:
-            status.value = _msg(
-                f"❌ Something went wrong: {err}. Try again, or run the Setup cell again.", "error"
-            )
+            status.value = _msg(f"❌ {_friendly_error(err)}", "error")
         else:
             status.value = _msg(
                 f"✅ Done: {result['seconds']} s of audio ({result['chunks']} part(s)). "
