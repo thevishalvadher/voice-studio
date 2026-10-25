@@ -107,26 +107,26 @@ RECORDER_HTML = """
 <div style="font-family:sans-serif;border:1px solid #ccc;border-radius:8px;padding:10px;margin:6px 0;max-width:600px">
   <b>Voice sample</b>
   <span style="color:#666">(10–30 seconds of ONE person speaking clearly, no music)</span>
-  <div style="margin-top:8px">Upload a file: <input type="file" id="mvs-file" accept="audio/*"></div>
+  <div style="margin-top:8px">Upload a file: <input type="file" id="vs-file" accept="audio/*"></div>
   <div style="margin-top:8px">or record with your mic:
-    <button id="mvs-rec">🎙️ Start recording</button>
-    <span id="mvs-timer" style="margin-left:8px"></span>
+    <button id="vs-rec">🎙️ Start recording</button>
+    <span id="vs-timer" style="margin-left:8px"></span>
   </div>
-  <audio id="mvs-preview" controls style="display:none;margin-top:8px;width:100%"></audio>
-  <div id="mvs-msg" style="margin-top:6px;color:#444"></div>
+  <audio id="vs-preview" controls style="display:none;margin-top:8px;width:100%"></audio>
+  <div id="vs-msg" style="margin-top:6px;color:#444"></div>
 </div>
 <script>
 (function () {
   const MAX_SECONDS = 30;                 // recording stops by itself after this
   const MAX_UPLOAD_MB = 25;
-  const fileInput = document.getElementById("mvs-file");
-  const recButton = document.getElementById("mvs-rec");
-  const timer = document.getElementById("mvs-timer");
-  const preview = document.getElementById("mvs-preview");
-  const msg = document.getElementById("mvs-msg");
+  const fileInput = document.getElementById("vs-file");
+  const recButton = document.getElementById("vs-rec");
+  const timer = document.getElementById("vs-timer");
+  const preview = document.getElementById("vs-preview");
+  const msg = document.getElementById("vs-msg");
   let recorder = null, chunks = [], seconds = 0, tick = null;
 
-  // Send an audio Blob to Python (the function "mvs_receive_sample").
+  // Send an audio Blob to Python (the function "vs_receive_sample").
   async function sendToPython(blob, filename) {
     preview.src = URL.createObjectURL(blob);
     preview.style.display = "block";
@@ -139,7 +139,7 @@ RECORDER_HTML = """
         reader.readAsDataURL(blob);
       });
       const base64 = dataUrl.split(",")[1];
-      await google.colab.kernel.invokeFunction("mvs_receive_sample", [base64, filename], {});
+      await google.colab.kernel.invokeFunction("vs_receive_sample", [base64, filename], {});
       msg.textContent = "✅ Sample ready (" + filename + "). Listen to it above, then click Save Voice below.";
     } catch (err) {
       msg.textContent = "❌ Could not send the sample. Run the Setup cell, then this cell again. (" + err + ")";
@@ -255,7 +255,7 @@ def show_add_voice():
     # Connect the JavaScript recorder to Python (only works inside Colab).
     try:
         from google.colab import output
-        output.register_callback("mvs_receive_sample", _receive_sample)
+        output.register_callback("vs_receive_sample", _receive_sample)
         recorder = HTML(RECORDER_HTML)
     except ImportError:
         recorder = HTML(_msg("Upload and recording only work inside Google Colab.", "error"))

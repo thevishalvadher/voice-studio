@@ -1,8 +1,7 @@
-# 🎙️ Muskaanpur Voice Studio
+# 🎙️ Voice Studio
 
-A small voice-cloning text-to-speech tool for **Hindi** and **English**, made for the
-"Muskaanpur ki Kahaniyan" stories. Give it a 10–30 second voice sample, type a line,
-and get a WAV + MP3 in that voice.
+A small voice-cloning text-to-speech tool for **Hindi** and **English**.
+Give it a 10–30 second voice sample, type a line, and get a WAV + MP3 in that voice.
 
 - Runs **inside a free Google Colab notebook** (T4 GPU). There is no separate website, link or tunnel, which is what Colab's free tier allows.
 - Voices and audio are saved in **your Google Drive**, so they survive restarts.
@@ -56,7 +55,7 @@ In the **3. Generate** section:
 ## 4. Where things are saved (Google Drive)
 
 ```
-MyDrive/MuskaanpurVoiceStudio/
+MyDrive/VoiceStudio/
 ├── voices/
 │   ├── voices.json              ← list of all your voices
 │   └── bhola_kaka/
@@ -77,7 +76,7 @@ Voice samples, audio and personal data are **never** committed to this GitHub re
 
 ### Milestone checks
 
-- [ ] **M1 Skeleton**: *1. Setup* finishes with `✅ Setup done`. In Drive, `MuskaanpurVoiceStudio/voices/voices.json` and `outputs/` exist. *2. Add Voice* and *3. Generate* both show their fields.
+- [ ] **M1 Skeleton**: *1. Setup* finishes with `✅ Setup done`. In Drive, `VoiceStudio/voices/voices.json` and `outputs/` exist. *2. Add Voice* and *3. Generate* both show their fields.
 - [ ] **M2 Engine**: run **Engine test**. `hi_test.wav` and `en_test.wav` play, and are saved in `outputs/test/`. The Setup log says `CUDA` (GPU), not `CPU`.
 - [ ] **M3 Add Voice**: save a voice. It appears in the Generate voice list. Then **Runtime → Disconnect and delete runtime**, reopen, run *1. Setup* and *3. Generate*: the voice is still in the list.
 - [ ] **M4 Generate + download**: paste a ~600-character Hindi paragraph (e.g. all 3 Hindi lines below, twice). You get **one** file, the status says it used several parts, and both download links work. The MP3 opens in CapCut.
@@ -106,7 +105,7 @@ The `tests/` folder checks the logic with a **fake engine**, so it runs anywhere
 In Colab (after Setup), run this in a new cell:
 
 ```
-!cd /content/muskaanpur-voice-studio && python -m unittest discover -s tests -t . -v
+!cd /content/voice-studio && python -m unittest discover -s tests -t . -v
 ```
 
 On your own computer: `pip install numpy soundfile pydub ipywidgets` (plus `audioop-lts` on

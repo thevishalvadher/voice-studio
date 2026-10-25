@@ -33,7 +33,7 @@ class GenerateTest(StudioTestCase):
             self.assertTrue(result["mp3"].exists())
 
     def test_long_text_is_split_and_joined_with_gaps(self):
-        sentence = "मुस्कानपुर गाँव में एक बहुत पुराना बरगद का पेड़ था, जिसके नीचे सब बच्चे कहानियाँ सुनते थे।"
+        sentence = "हमारे गाँव में एक बहुत पुराना बरगद का पेड़ था, जिसके नीचे सब बच्चे कहानियाँ सुनते थे।"
         text = " ".join([sentence] * 7)  # about 640 characters
         result = generate.generate("bhola_kaka", text)
 

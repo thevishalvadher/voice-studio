@@ -39,7 +39,7 @@ class SplitTextTest(unittest.TestCase):
         self.assertEqual(text_utils.split_text("Hello. How are you?"), ["Hello. How are you?"])
 
     def test_long_paragraph_chunks_fit_and_end_at_sentences(self):
-        sentence = "मुस्कानपुर गाँव में एक बहुत पुराना बरगद का पेड़ था, जिसके नीचे सब बच्चे कहानियाँ सुनते थे।"
+        sentence = "हमारे गाँव में एक बहुत पुराना बरगद का पेड़ था, जिसके नीचे सब बच्चे कहानियाँ सुनते थे।"
         text = " ".join([sentence] * 8)  # about 730 characters
         chunks = text_utils.split_text(text, max_chars=250)
         self.assertGreater(len(chunks), 1)

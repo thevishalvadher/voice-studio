@@ -1,5 +1,5 @@
 """
-config.py - all the settings for Muskaanpur Voice Studio in one place.
+config.py - all the settings for Voice Studio in one place.
 
 Think of this like a CSS variables file: change a number here and the
 whole app uses the new value.
@@ -18,10 +18,10 @@ CODE_DIR = Path(__file__).resolve().parent
 
 # Folder in Google Drive that holds your voices and audio outputs.
 # (Tests change this to a temporary folder, so they never touch Drive.)
-DATA_ROOT = Path("/content/drive/MyDrive/MuskaanpurVoiceStudio")
+DATA_ROOT = Path("/content/drive/MyDrive/VoiceStudio")
 
 # Temporary folder for uploads/recordings before they are saved as a voice.
-TEMP_DIR = Path("/content/mvs_temp")
+TEMP_DIR = Path("/content/voice_studio_temp")
 
 LANGUAGES_FILE = CODE_DIR / "languages.json"
 
