@@ -211,7 +211,29 @@ def show_add_voice():
     status = widgets.HTML()
 
     def on_save(_button):
-        status.value = _msg("Save is not ready yet (coming in Milestone 3).")
+        save_btn.disabled = True
+        status.value = _msg("⏳ Cleaning the sample and learning the voice (about 20 seconds)…")
+        try:
+            voice = voices.add_voice(
+                name_box.value, language_dd.value, _state["sample_path"], consent_cb.value
+            )
+        except StudioError as err:
+            status.value = _msg(f"❌ {err}", "error")
+        except Exception as err:
+            status.value = _msg(
+                f"❌ Something went wrong: {err}. Try again, or run the Setup cell again.", "error"
+            )
+        else:
+            status.value = _msg(
+                f"✅ Saved '{voice['name']}' ({voice['sample_seconds']} s sample). "
+                "Pick it in the Generate section below.", "ok"
+            )
+            _state["sample_path"] = None
+            name_box.value = ""
+            consent_cb.value = False
+            refresh_voice_list()
+        finally:
+            save_btn.disabled = False
 
     save_btn.on_click(on_save)
 

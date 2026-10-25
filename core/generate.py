@@ -16,18 +16,6 @@ TEST_LINES = {
 }
 
 
-def engine_for_language(code):
-    """Look up a language in languages.json and return (engine, language_info)."""
-    languages = config.load_languages()
-    info = languages.get(code)
-    if info is None:
-        raise StudioError(f"Language '{code}' is not in languages.json.")
-    if not info.get("enabled"):
-        note = info.get("note", "not available yet")
-        raise StudioError(f"{info['label']} is coming soon ({note}).")
-    return engines.get_engine(info["engine"]), info
-
-
 def generate_test_lines(sample_path=None):
     """Speak the Hindi and English test lines and save them to outputs/test/.
 
@@ -40,7 +28,7 @@ def generate_test_lines(sample_path=None):
     out_dir.mkdir(parents=True, exist_ok=True)
     saved = []
     for code, line in TEST_LINES.items():
-        engine, info = engine_for_language(code)
+        engine, info = engines.for_language(code)
         audio = engine.synthesize(line, info["language_id"], config.DEFAULT_SETTINGS,
                                   sample_path=sample_path or None)
         path = out_dir / f"{code}_test.wav"

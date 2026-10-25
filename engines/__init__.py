@@ -37,3 +37,20 @@ def get_engine(name):
     engine = getattr(module, class_name)()
     _loaded[name] = engine
     return engine
+
+
+def for_language(code):
+    """Look up a language in languages.json and return (engine, language_info).
+
+    Example: for_language("hi") -> (the Chatterbox engine, {"label": "Hindi", ...})
+    """
+    import config
+    from core import StudioError
+
+    info = config.load_languages().get(code)
+    if info is None:
+        raise StudioError(f"Language '{code}' is not in languages.json.")
+    if not info.get("enabled"):
+        note = info.get("note", "not available yet")
+        raise StudioError(f"{info['label']} is coming soon ({note}).")
+    return get_engine(info["engine"]), info
