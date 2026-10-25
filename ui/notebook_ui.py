@@ -254,6 +254,19 @@ def show_add_voice():
 # 3. Generate
 # ---------------------------------------------------------------------------
 
+def _download_link(path, mime_type, label):
+    """An HTML download link with the file built in (works without a server)."""
+    import base64
+    from pathlib import Path
+
+    data = base64.b64encode(Path(path).read_bytes()).decode()
+    return (
+        f'<a download="{Path(path).name}" href="data:{mime_type};base64,{data}" '
+        'style="display:inline-block;padding:6px 12px;border-radius:6px;background:#1a73e8;'
+        f'color:#fff;text-decoration:none;font-family:sans-serif">⬇️ {label}</a>'
+    )
+
+
 def _voice_options():
     """Voice dropdown entries: ("Bhola Kaka (Hindi)", "bhola_kaka")."""
     languages = config.load_languages()
@@ -311,8 +324,54 @@ def show_generate():
     status = widgets.HTML()
     player = widgets.Output()
 
+    def on_voice_change(_change=None):
+        """When a voice is picked, show its saved Advanced values."""
+        if not voice_dd.value:
+            return
+        saved = voices.get_voice(voice_dd.value).get("settings", {})
+        exaggeration.value = saved.get("exaggeration", defaults["exaggeration"])
+        seed.value = saved.get("seed", defaults["seed"])
+
+    voice_dd.observe(on_voice_change, names="value")
+    on_voice_change()
+
+    def on_progress(done, total):
+        status.value = _msg(f"⏳ Generating part {done + 1} of {total}…")
+
     def on_generate(_button):
-        status.value = _msg("Generate is not ready yet (coming in Milestone 4).")
+        from IPython.display import Audio
+
+        from core import generate
+
+        gen_btn.disabled = True
+        player.clear_output()
+        status.value = _msg("⏳ Starting…")
+        try:
+            if not voice_dd.value:
+                raise StudioError("Please add a voice first (in the 'Add Voice' section).")
+            result = generate.generate(
+                voice_dd.value, text_box.value,
+                exaggeration=exaggeration.value, seed=seed.value, on_progress=on_progress,
+            )
+        except StudioError as err:
+            status.value = _msg(f"❌ {err}", "error")
+        except Exception as err:
+            status.value = _msg(
+                f"❌ Something went wrong: {err}. Try again, or run the Setup cell again.", "error"
+            )
+        else:
+            status.value = _msg(
+                f"✅ Done: {result['seconds']} s of audio ({result['chunks']} part(s)). "
+                f"Saved to Drive: {result['wav'].parent}", "ok"
+            )
+            with player:
+                display(Audio(filename=str(result["mp3"])))
+                display(HTML(
+                    _download_link(result["wav"], "audio/wav", "Download WAV") + " &nbsp; "
+                    + _download_link(result["mp3"], "audio/mpeg", "Download MP3")
+                ))
+        finally:
+            gen_btn.disabled = False
 
     gen_btn.on_click(on_generate)
 

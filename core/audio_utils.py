@@ -99,3 +99,27 @@ def clean_sample(in_path, out_path):
 
     save_wav(out_path, normalize(audio), sample_rate)
     return round(length, 1)
+
+
+def join_chunks(chunks, sample_rate, gap_ms=config.GAP_MS):
+    """Join audio pieces into one, with a short silence (150 ms) between them."""
+    gap = np.zeros(int(sample_rate * gap_ms / 1000), dtype=np.float32)
+    parts = []
+    for i, chunk in enumerate(chunks):
+        if i > 0:
+            parts.append(gap)
+        parts.append(np.asarray(chunk, dtype=np.float32))
+    return np.concatenate(parts) if parts else np.zeros(0, dtype=np.float32)
+
+
+def wav_to_mp3(wav_path, mp3_path, bitrate=config.MP3_BITRATE):
+    """Make an MP3 copy of a WAV file (192 kbps by default).
+
+    The MP3 is saved at 44,100 Hz: MP3s at 24,000 Hz cannot go above 160 kbps,
+    and 44.1 kHz also opens cleanly in video editors like CapCut.
+    """
+    from pydub import AudioSegment
+
+    AudioSegment.from_wav(str(wav_path)).export(
+        str(mp3_path), format="mp3", bitrate=bitrate, parameters=["-ar", "44100"]
+    )
