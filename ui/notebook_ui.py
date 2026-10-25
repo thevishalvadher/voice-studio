@@ -15,6 +15,7 @@ import ipywidgets as widgets
 from IPython.display import HTML, display
 
 import config
+import engines
 from core import StudioError
 from core import voices
 
@@ -43,11 +44,39 @@ def _msg(text, kind="info"):
 # ---------------------------------------------------------------------------
 
 def setup():
-    """Create the Drive folders and an empty voices.json if needed."""
+    """Create the Drive folders, then load each engine used by an enabled language (once)."""
     voices.ensure_storage()
     print("📁 Voices folder: ", config.voices_dir())
     print("📁 Outputs folder:", config.outputs_dir())
     print(f"🗣️  Saved voices: {len(voices.list_voices())}")
+
+    engine_names = {info["engine"] for info in config.enabled_languages().values()}
+    for name in sorted(engine_names):
+        engine = engines.get_engine(name)
+        print(f"⏳ Loading voice model '{name}' (first time: a few minutes)…")
+        engine.load()
+        device = getattr(engine, "device", "?")
+        print(f"✅ Model '{name}' ready on {device.upper() if device else '?'}")
+        if device == "cpu":
+            print("⚠️  No GPU found, so this will be VERY slow. "
+                  "Go to Runtime → Change runtime type → T4 GPU, then run Setup again.")
+    print("✅ Setup done. Now run '2. Add Voice' or '3. Generate'.")
+
+
+def run_engine_test(sample_path=""):
+    """Milestone 2 check: speak a Hindi and an English test line and play them."""
+    from IPython.display import Audio
+
+    from core import generate
+
+    try:
+        paths = generate.generate_test_lines(sample_path.strip() or None)
+    except StudioError as err:
+        display(HTML(_msg(f"❌ {err}", "error")))
+        return
+    for path in paths:
+        display(HTML(_msg(f"✅ {path.name} saved to {path}", "ok")))
+        display(Audio(filename=str(path)))
 
 
 # ---------------------------------------------------------------------------
