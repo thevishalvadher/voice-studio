@@ -1,0 +1,11 @@
+# Packages the Colab notebook installs (Colab already has most of the rest).
+# The TTS engine. Pulls in torch, librosa and the PerTh watermarker.
+chatterbox-tts==0.1.7
+# Reads any audio format and writes MP3 (uses ffmpeg, which Colab already has).
+pydub
+# pydub needs this on Python 3.13+ (the "audioop" module was removed there).
+audioop-lts; python_version >= "3.13"
+# Writes WAV files.
+soundfile
+# The buttons and text boxes inside the notebook.
+ipywidgets

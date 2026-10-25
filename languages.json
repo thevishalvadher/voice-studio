@@ -1,0 +1,21 @@
+{
+  "hi": {
+    "label": "Hindi",
+    "engine": "chatterbox_mtl",
+    "language_id": "hi",
+    "enabled": true
+  },
+  "en": {
+    "label": "English",
+    "engine": "chatterbox_mtl",
+    "language_id": "en",
+    "enabled": true
+  },
+  "gu": {
+    "label": "Gujarati",
+    "engine": null,
+    "language_id": "gu",
+    "enabled": false,
+    "note": "Blocked: licence"
+  }
+}

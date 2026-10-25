@@ -1,0 +1,18 @@
+# Python junk
+__pycache__/
+*.pyc
+.pytest_cache/
+.ipynb_checkpoints/
+
+# NEVER commit voices, audio or personal data.
+# These live in Google Drive, not in this repo.
+voices/
+outputs/
+*.wav
+*.mp3
+*.m4a
+*.ogg
+*.webm
+*.flac
+*.pt
+consent*
