@@ -220,6 +220,7 @@ def show_add_voice():
 
     consent_cb = widgets.Checkbox(
         description="I have signed consent from this person to clone their voice (required)",
+        indent=False,
         style=WIDE,
         layout=widgets.Layout(width="auto"),
     )
