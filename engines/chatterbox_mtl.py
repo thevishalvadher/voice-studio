@@ -22,6 +22,9 @@ def set_seed(seed):
     torch.manual_seed(seed)
     if torch.cuda.is_available():
         torch.cuda.manual_seed_all(seed)
+        # Ask the GPU to pick the same maths path every time (more repeatable).
+        torch.backends.cudnn.deterministic = True
+        torch.backends.cudnn.benchmark = False
 
 
 class ChatterboxMtlEngine(Engine):
@@ -86,6 +89,8 @@ class ChatterboxMtlEngine(Engine):
         else:
             self.model.conds = self._demo_conds               # built-in demo voice
 
-        set_seed(settings["seed"])  # same seed + same text = same audio
+        # Reset the seed before EVERY piece, so a line always comes out the
+        # same no matter what was generated before it.
+        set_seed(settings["seed"])
         wav = self.model.generate(text, **options)  # watermark is added in here
         return wav.squeeze(0).detach().cpu().numpy().astype(np.float32)

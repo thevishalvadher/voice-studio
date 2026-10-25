@@ -76,7 +76,20 @@ def generate(voice_id, text, exaggeration=None, seed=None, on_progress=None):
     if seed is not None:
         settings["seed"] = int(seed)
 
+    # Consistency (Milestone 5): ALWAYS speak from the cached fingerprint
+    # (conds.pt) plus the voice's fixed seed, never from the raw sample. Same
+    # fingerprint + same seed = the same line sounds the same, and different
+    # lines sound like the same person.
     conds_path = voices.data_path(voice["conds_file"])
+    if not conds_path.exists():
+        # conds.pt was deleted or never finished: rebuild it once from the clean sample.
+        sample_path = voices.data_path(voice["sample_file"])
+        if not sample_path.exists():
+            raise StudioError(
+                f"The files for voice '{voice['name']}' are missing in Drive. "
+                "Please add the voice again."
+            )
+        engine.prepare_voice(sample_path, conds_path, settings)
 
     chunks = text_utils.split_text(text, config.CHUNK_CHARS)
     pieces = []
