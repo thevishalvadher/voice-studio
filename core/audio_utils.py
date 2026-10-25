@@ -33,7 +33,8 @@ def load_audio(path, sample_rate=config.SAMPLE_RATE):
     from pydub import AudioSegment  # uses ffmpeg behind the scenes
 
     try:
-        sound = AudioSegment.from_file(str(path))
+        with open(path, "rb") as f:  # ffmpeg works out the format by itself
+            sound = AudioSegment.from_file(f)
     except Exception:
         raise StudioError("Could not read this audio file. Please use WAV, MP3, M4A, OGG or WEBM.")
     sound = sound.set_channels(1).set_frame_rate(sample_rate).set_sample_width(2)
