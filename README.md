@@ -9,13 +9,13 @@ Give it a 10–30 second voice sample, type a line, and get a WAV + MP3 in that 
   Every output keeps Resemble's invisible **PerTh watermark**, which we never turn off.
 - Gujarati is listed but **switched off** until its licence is clear (see `research-plan.md`).
 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/thevishalvadher/muskaanpur-voice-studio/blob/main/notebook.ipynb)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/thevishalvadher/voice-studio/blob/main/notebook.ipynb)
 
 ---
 
 ## 1. Run it in Colab (step by step)
 
-1. Click the **Open in Colab** badge above (or go to <https://colab.research.google.com>, choose **File → Open notebook → GitHub**, paste `thevishalvadher/muskaanpur-voice-studio` and pick `notebook.ipynb`).
+1. Click the **Open in Colab** badge above (or go to <https://colab.research.google.com>, choose **File → Open notebook → GitHub**, paste `thevishalvadher/voice-studio` and pick `notebook.ipynb`).
 2. Menu **Runtime → Change runtime type → Hardware accelerator: T4 GPU → Save**.
 3. Run **1. Setup** (click the ▶ button on the cell).
    - The first time it installs packages (about 3 minutes). The runtime may then **restart by itself once**, and Colab may say "session crashed". That is expected.
